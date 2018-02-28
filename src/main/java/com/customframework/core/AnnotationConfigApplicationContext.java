@@ -23,6 +23,8 @@ public class AnnotationConfigApplicationContext implements ApplicationContext {
 
     private static final Map<String, Object> register = new ConcurrentHashMap<>();
     private static final Map<String, Class> definitions = new ConcurrentHashMap<>();
+
+    //Map<InterfaceName, Map<MethodName, Query>>
     private static final Map<String, Map<String, String>> noImplIntrfs = new ConcurrentHashMap<>();
 
     //format com.mypkg.bin
@@ -42,13 +44,9 @@ public class AnnotationConfigApplicationContext implements ApplicationContext {
     @Override
     public Object getBean(Class requiredType) {
 
-//        for (Class klass : definitions.values()) {
             if (definitions.values().contains(requiredType)) {
-//                if (klass.equals(requiredType)) {
                     return register.get(requiredType.getName());
-//                }
             }
-//        }
         return null;
     }
 
@@ -57,61 +55,10 @@ public class AnnotationConfigApplicationContext implements ApplicationContext {
         return register.keySet();
     }
 
-//    @PostConstruct
     public void init() throws IllegalAccessException, ClassNotFoundException, InstantiationException {
         scan(basePackages);
         autowiredFields();
 
-    }
-
-
-    private Set<Class> findCandidateComponents(String basePackage) {
-
-        Set<Class> candidates = new LinkedHashSet<>();
-
-
-
-//        Path startPath = Paths.get(basePackage.replace(".", File.separator)).normalize();
-////        Path startPath = Paths.get(basePackage).normalize();
-//
-////        String pattern = "glob:"+basePackage+".*.class";
-////        String pattern = "classpath*:"+basePackage.replace(".", File.separator)+File.separator+"*.class";
-//        String pattern = "glob:"+basePackage.replace(".", File.separator)+File.separator+"*.class";
-//
-//        try {
-//            FileFinder fileFinder = new FileFinder(pattern);
-//            Files.walkFileTree(startPath, fileFinder);
-//            candidates = fileFinder.getCandidates();
-//            System.out.println("File search completed!");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-//        File path;
-//        File[] files;
-//        try {
-//            path = new File("glob*:"+basePackage+"*.class");
-//            if (!path.exists()) {
-//                throw new IOException("Cannot access " + basePackage + ": No such file or directory");
-//            }
-//            if (path.isFile()) {
-//                files = new File[]{path};
-//            } else {
-//                files = path.listFiles();
-//            }
-//
-//            if (files != null) {
-//                for (File file : files) {
-//                    if (file.isFile()) {
-//                        candidates.add(Class.forName(file.getCanonicalPath()));
-//                    }
-//                }
-//            }
-//        } catch (Exception ex) {
-//            //NOP
-//        }
-
-        return candidates;
     }
 
 
@@ -123,8 +70,6 @@ public class AnnotationConfigApplicationContext implements ApplicationContext {
 
 //        System.out.println(candidates);
 
-//        for (String basePackage : basePackages) {
-//            Set<Class> candidates = findCandidateComponents(basePackage);
             for (String candidateName : candidates) {
                 Class candidate = Class.forName(candidateName);
                 if (candidate.isAnnotationPresent(Component.class)) {
@@ -135,7 +80,6 @@ public class AnnotationConfigApplicationContext implements ApplicationContext {
                     register.put(candidateName, Proxy.newProxyInstance(candidate.getClassLoader(), new Class[]{candidate}, new InvocationHandler() {
                         @Override
                         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-//                            return method.invoke(candidate, args);
                             String result = null;
                             if (noImplIntrfs.containsKey(candidateName)) {
                                 if (noImplIntrfs.get(candidateName).containsKey(method.getName())) {
@@ -150,13 +94,11 @@ public class AnnotationConfigApplicationContext implements ApplicationContext {
                             return result;
                         }
                     }));
-//                    register.put(candidateName, candidate.newInstance());
                     definitions.put(candidateName, candidate);
 
                     noImplIntrfs.put(candidateName, parseMethodNameToQuery(candidate.getDeclaredMethods()));
                 }
             }
-//        }
     }
 
     private void autowiredFields() throws IllegalAccessException {
@@ -266,38 +208,6 @@ public class AnnotationConfigApplicationContext implements ApplicationContext {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    public static ClassLoader getDefaultClassLoader() {
-//        ClassLoader cl = null;
-//        try {
-//            cl = Thread.currentThread().getContextClassLoader();
-//        } catch (Throwable ex) {
-//            // NOP
-//        }
-//        if (cl == null) {
-//            try {
-//                cl = ClassLoader.getSystemClassLoader();
-//            } catch (Throwable ex) {
-//                // NOP
-//            }
-//        }
-//        return cl;
-//    }
 
 
 }

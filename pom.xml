@@ -6,7 +6,7 @@
 
     <groupId>com.customframework</groupId>
     <artifactId>customframework-core</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.0-RELEASE</version>
     <packaging>jar</packaging>
 
     <properties>
