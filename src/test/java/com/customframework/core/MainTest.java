@@ -1,5 +1,5 @@
-import com.customframework.core.AnnotationConfigApplicationContext;
-import com.customframework.core.ApplicationContext;
+package com.customframework.core;
+
 import org.junit.Test;
 
 /**
@@ -12,13 +12,14 @@ public class MainTest {
 
     @Test
     public void test() throws IllegalAccessException, ClassNotFoundException, InstantiationException {
-        ApplicationContext context = new AnnotationConfigApplicationContext("src.test.java.com.customframework.core");
+        ApplicationContext context = new AnnotationConfigApplicationContext("com.customframework.core");
         context.init();
         System.out.println(context.getBeanNames().toString());
         System.out.println();
         context.getBean(ClassA.class).test();
         System.out.println();
-        context.getBean(ClassB.class).test();
+        ClassB beanB = (ClassB) context.getBean("com.customframework.core.ClassB");
+        beanB.test();
 
         System.out.println();
         context.getBean(ClassC.class).findByName("Name");
@@ -26,8 +27,6 @@ public class MainTest {
         context.getBean(ClassC.class).findByNameOrLastName("Name", "LastName");
 
 
-//        ClassA bean = context.getBean(ClassA.class);
-//        bean.test();
     }
 
 }

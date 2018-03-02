@@ -1,3 +1,5 @@
+package com.customframework.core;
+
 import com.customframework.core.annotation.Component;
 
 /**
